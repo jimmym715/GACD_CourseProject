@@ -5,7 +5,7 @@ zipFilename <- "getdata-projectfiles-UCI HAR Dataset.zip"
 run_analysis <- function() {
   
   # console message
-  cat("check for zip file named '", zipFilename, "'\n", sep = "")
+  cat("Check for zip file named '", zipFilename, "'\n\n", sep = "")
 
   # set zip file download URL
   zipFileDownloadUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
@@ -17,7 +17,7 @@ run_analysis <- function() {
   if (!file.exists(zipFilename)) {
     
     # console message
-    cat("zip file is not present so download file from ", zipFileDownloadUrl, "'\n")
+    cat("Zip file is not present so download file from ", zipFileDownloadUrl, "'\n\n")
     
     # download the zip file since it's 
     # not present in the working directory
@@ -42,9 +42,6 @@ run_analysis <- function() {
   # get features file from zip file
   featuresFile <- unz(zipFilename, featuresFilename)
   
-  # console message
-  #cat("Read ", featuresFilename, " into a table\n", sep = "'")
-  
   # read features data into table
   features <- read.table(featuresFile)
   
@@ -61,9 +58,6 @@ run_analysis <- function() {
   # get activity_labels.txt from zip file
   activityLabelsFile <- unz(zipFilename, activityLabelsFilename)
   
-  # console message
-  #cat("Read ", activityLabelsFilename, " into a table with ActivityID and ActivityType as the column names for the first and second columns, respectively\n", sep = "'")
-
   # read activity labels data into table
   activityLabels <- read.table(activityLabelsFile, stringsAsFactors=FALSE, col.names = c("ActivityCode", "ActivityType"))
   
@@ -74,19 +68,19 @@ run_analysis <- function() {
   #      which is defined at the end of this script
 
   # console message
-  cat("Call readHumanActivityRecognitionData to process test data\n")
+  cat("Call readHumanActivityRecognitionData to process test data\n\n")
   
   # process the test data
   testData <- readHumanActivityRecognitionData("test", features, activityLabels)
   
   # console message
-  cat("Call readHumanActivityRecognitionData to process train data\n")
+  cat("Call readHumanActivityRecognitionData to process train data\n\n")
   
   # process the train data
   trainData <- readHumanActivityRecognitionData("train", features, activityLabels)
   
   # console message
-  cat("Bind the testData and trainData\n")
+  cat("Bind the testData and trainData\n\n")
   
   # combine the test data and the train data into a single table
   allData <- rbind(testData, trainData)
@@ -102,9 +96,6 @@ run_analysis <- function() {
   # note that grep will return the column *numbers*
   # for the matching column names (which actually makes life easier below)
   subjectIdAndActivityPlusMeanAndStdColNumbers <- grep("(-mean[(][)]|std[(][)])|^Activity$|^SubjectID$", dataColNames)
-  
-  # console message
-  #cat("create a subset of the measurement data that includes only SubjectID, Activity, any column name containing '-mean()', and any column name containing '-any()'\n")
   
   # restrict the data from the allData table
   # by only retrieving the column numbers identified
@@ -147,7 +138,7 @@ run_analysis <- function() {
   meanAndStdData <- meanAndStdDF[,3:ncol(meanAndStdDF)]
   
   # console message
-  cat("aggregate the measurement data by SubjectID and then by Activity, and apply the mean function\n")
+  cat("Aggregate the measurement data by SubjectID and then by Activity, and apply the mean function\n\n")
   
   # Aggregating the data is now simple, as, again, 
   # I'll pass the following parameters:
@@ -156,9 +147,6 @@ run_analysis <- function() {
   #   - activitySubjectId: data frame of grouping columns
   #   - mean:              the function name to apply
   meanAndStdAggregate <- aggregate(meanAndStdData, activitySubjectId, mean)
-  
-  # console message
-  #cat("format aggregated data for tidy data result\n")
   
   # Before writing this tidy data to a text file, 
   # I'd like to add the prefix "mean_" to each of the data column names
@@ -189,10 +177,13 @@ run_analysis <- function() {
   tidyDataFileName <- "HAR_analysis_tidy_data.txt"
 
   # console message
-  cat("write the final aggregated tidy data to ", tidyDataFileName, " in the working directory.\n", sep = "'")
+  cat("Write the final aggregated tidy data to ", tidyDataFileName, " in the working directory.\n\n", sep = "'")
   
   # write the final aggregated tidy data to a file as a table
   write.table(finalAggregate, file = tidyDataFileName, row.names = FALSE)
+  
+  # console message
+  cat("Done (Success!)")
 }
 
 # This function reads in all data related to the data set, 
@@ -230,9 +221,6 @@ readHumanActivityRecognitionData <- function(dataSetName, features, activityLabe
   # get subjects file from zip file
   subjectsFile <- unz(zipFilename, subjectsFileName)
   
-  # console message
-  #cat("Read ", subjectsFileName, " into a table with 'SubjectID' as the column name for the single column in this file\n", sep = "'")
-  
   # read subjects data into table
   subjects <- read.table(subjectsFile, col.names = c("SubjectID"))
   
@@ -245,17 +233,11 @@ readHumanActivityRecognitionData <- function(dataSetName, features, activityLabe
   # get y data file from zip file
   yDataFile <- unz(zipFilename, yDataFileName)
   
-  # console message
-  #cat("Read ", yDataFileName, " into a table with 'Activity' as the column name for the single column in this file\n", sep = "'")
-  
   # read y data into table
   ydata <- read.table(yDataFile, col.names = c("Activity"))
   
   # get the number of activity labels (to use in the for loop below)
   numActivityLabels <- nrow(activityLabels)
-  
-  # console message
-  #cat("Loop thru the rows in the activityLabels table and change the ActivityID values in the ydata table to the matching ActivityType value\n")
   
   # Loop thru the rows in the activityLabels table
   # and change the ActivityID values in the ydata table
@@ -275,20 +257,17 @@ readHumanActivityRecognitionData <- function(dataSetName, features, activityLabe
   xDataFile <- unz(zipFilename, xDataFileName)
   
   # console message
-  cat("Read ", xDataFileName, " into a table\n", sep = "'")
+  cat("Read ", xDataFileName, " into a table\n\n", sep = "'")
   
   # read X data into table
   xdata <- read.table(xDataFile)
-  
-  # console message
-  #cat("Set the column names in the xdata to be the values in the second column of the features data\n")
   
   # apply the second column of the features table
   # as the column names for the X data
   colnames(xdata) <- features[,2]
   
   # console message
-  cat("bind the columns in the ", dataSetName, " subjects, ydata, and xdata tables, in that order\n", sep = "'")
+  cat("Bind the columns in the ", dataSetName, " subjects, ydata, and xdata tables, in that order\n\n", sep = "'")
   
   # bind together the following:
   #   - subjects (SubjectID column)
